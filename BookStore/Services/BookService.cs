@@ -1,5 +1,6 @@
 using BookStore.Data;
-using BookStore.DTOs;
+using BookStore.DTOs.Requests;
+using BookStore.DTOs.Responses;
 using BookStore.Interfaces;
 using BookStore.Models;
 using Microsoft.EntityFrameworkCore;
@@ -15,49 +16,49 @@ public class BookService : IBookService
         _context = context;
     }
 
-    public async Task<IEnumerable<BookResponseDto>> GetAllAsync()
+    public async Task<IEnumerable<BookResponse>> GetAllAsync()
     {
         return await _context.Books
             .AsNoTracking()
-            .Select(b => ToDto(b))
+            .Select(b => ToResponse(b))
             .ToListAsync();
     }
 
-    public async Task<BookResponseDto?> GetByIdAsync(int id)
+    public async Task<BookResponse?> GetByIdAsync(int id)
     {
         var book = await _context.Books.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
-        return book is null ? null : ToDto(book);
+        return book is null ? null : ToResponse(book);
     }
 
-    public async Task<BookResponseDto> CreateAsync(CreateBookDto dto)
+    public async Task<BookResponse> CreateAsync(CreateBookRequest request)
     {
         var book = new Book
         {
-            Title = dto.Title,
-            Author = dto.Author,
-            Price = dto.Price,
-            Stock = dto.Stock,
+            Title = request.Title,
+            Author = request.Author,
+            Price = request.Price,
+            Stock = request.Stock,
             CreatedAt = DateTime.UtcNow
         };
 
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
-        return ToDto(book);
+        return ToResponse(book);
     }
 
-    public async Task<BookResponseDto?> UpdateAsync(int id, UpdateBookDto dto)
+    public async Task<BookResponse?> UpdateAsync(int id, UpdateBookRequest request)
     {
         var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
         if (book is null) return null;
 
-        book.Title = dto.Title;
-        book.Author = dto.Author;
-        book.Price = dto.Price;
-        book.Stock = dto.Stock;
+        book.Title = request.Title;
+        book.Author = request.Author;
+        book.Price = request.Price;
+        book.Stock = request.Stock;
 
         await _context.SaveChangesAsync();
-        return ToDto(book);
+        return ToResponse(book);
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -70,6 +71,6 @@ public class BookService : IBookService
         return true;
     }
 
-    private static BookResponseDto ToDto(Book b) =>
+    private static BookResponse ToResponse(Book b) =>
         new(b.Id, b.Title, b.Author, b.Price, b.Stock, b.CreatedAt);
 }
