@@ -9,12 +9,16 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<Book> Books => Set<Book>();
+    public DbSet<Book> Books { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Book>()
-            .Property(b => b.Price)
-            .HasColumnType("decimal(18,2)");
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Book>(entity =>
+        {
+            entity.Property(b => b.Price)
+                  .HasColumnType("decimal(18,2)");
+        });
     }
 }
