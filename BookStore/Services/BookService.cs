@@ -27,7 +27,7 @@ public class BookService : IBookService
 
     public async Task<BookResponse?> GetByIdAsync(int id)
     {
-        var book = await _context.Books
+        Book? book = await _context.Books
             .AsNoTracking()
             .Include(b => b.Author)
             .FirstOrDefaultAsync(b => b.Id == id);
@@ -37,10 +37,12 @@ public class BookService : IBookService
 
     public async Task<BookResponse?> CreateAsync(CreateBookRequest request)
     {
-        var authorExists = await _context.Authors.AnyAsync(a => a.Id == request.AuthorId);
-        if (!authorExists) return null;
-
-        var book = new Book
+        bool authorExists = await _context.Authors.AnyAsync(a => a.Id == request.AuthorId);
+        if (!authorExists)
+        {
+            return null;   
+        }
+        Book book = new Book()
         {
             Title = request.Title,
             AuthorId = request.AuthorId,
@@ -58,15 +60,19 @@ public class BookService : IBookService
 
     public async Task<BookResponse?> UpdateAsync(int id, UpdateBookRequest request)
     {
-        var book = await _context.Books
+        Book? book = await _context.Books
             .Include(b => b.Author)
             .FirstOrDefaultAsync(b => b.Id == id);
 
-        if (book is null) return null;
-
-        var authorExists = await _context.Authors.AnyAsync(a => a.Id == request.AuthorId);
-        if (!authorExists) return null;
-
+        if (book is null)
+        {
+            return null;            
+        }
+        bool authorExists = await _context.Authors.AnyAsync(a => a.Id == request.AuthorId);
+        if (!authorExists)
+        {
+            return null;   
+        }
         book.Title = request.Title;
         book.AuthorId = request.AuthorId;
         book.Price = request.Price;
@@ -84,9 +90,11 @@ public class BookService : IBookService
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
-        if (book is null) return false;
-
+        Book? book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+        if (book is null)
+        {
+            return false;            
+        }
         _context.Books.Remove(book);
         await _context.SaveChangesAsync();
         return true;

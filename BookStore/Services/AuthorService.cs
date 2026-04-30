@@ -26,13 +26,13 @@ public class AuthorService : IAuthorService
 
     public async Task<AuthorResponse?> GetByIdAsync(int id)
     {
-        var author = await _context.Authors.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+        Author? author = await _context.Authors.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
         return author is null ? null : ToResponse(author);
     }
 
     public async Task<AuthorResponse> CreateAsync(CreateAuthorRequest request)
     {
-        var author = new Author
+        Author author = new Author()
         {
             Name = request.Name,
             Bio = request.Bio,
@@ -47,9 +47,11 @@ public class AuthorService : IAuthorService
 
     public async Task<AuthorResponse?> UpdateAsync(int id, UpdateAuthorRequest request)
     {
-        var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == id);
-        if (author is null) return null;
-
+        Author? author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == id);
+        if (author is null)
+        {
+            return null;
+        }
         author.Name = request.Name;
         author.Bio = request.Bio;
 
@@ -59,9 +61,11 @@ public class AuthorService : IAuthorService
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == id);
-        if (author is null) return false;
-
+        Author? author = await _context.Authors.FirstOrDefaultAsync(a => a.Id == id);
+        if (author is null)
+        {
+            return false;
+        }
         _context.Authors.Remove(author);
         await _context.SaveChangesAsync();
         return true;
