@@ -9,8 +9,7 @@ public class UpdateBookRequest
     public string Title { get; set; } = string.Empty;
 
     [Required]
-    [MaxLength(100)]
-    public string Author { get; set; } = string.Empty;
+    public int AuthorId { get; set; }
 
     [Range(0, double.MaxValue)]
     public decimal Price { get; set; }

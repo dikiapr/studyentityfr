@@ -1,5 +1,39 @@
 @BookStore_HostAddress = http://localhost:5105
 
+### ============== AUTHORS ==============
+
+### Get all authors
+GET {{BookStore_HostAddress}}/api/authors
+Accept: application/json
+
+### Get author by id
+GET {{BookStore_HostAddress}}/api/authors/1
+Accept: application/json
+
+### Create an author
+POST {{BookStore_HostAddress}}/api/authors
+Content-Type: application/json
+
+{
+  "name": "Robert C. Martin",
+  "bio": "Author of Clean Code and Clean Architecture"
+}
+
+### Update an author
+PUT {{BookStore_HostAddress}}/api/authors/1
+Content-Type: application/json
+
+{
+  "name": "Robert C. Martin (Uncle Bob)",
+  "bio": "Software craftsman, author of Clean Code series"
+}
+
+### Delete an author
+DELETE {{BookStore_HostAddress}}/api/authors/1
+
+
+### ============== BOOKS ==============
+
 ### Get all books
 GET {{BookStore_HostAddress}}/api/books
 Accept: application/json
@@ -8,13 +42,13 @@ Accept: application/json
 GET {{BookStore_HostAddress}}/api/books/1
 Accept: application/json
 
-### Create a book
+### Create a book (authorId must exist)
 POST {{BookStore_HostAddress}}/api/books
 Content-Type: application/json
 
 {
   "title": "Clean Code",
-  "author": "Robert C. Martin",
+  "authorId": 1,
   "price": 150000,
   "stock": 10
 }
@@ -25,7 +59,7 @@ Content-Type: application/json
 
 {
   "title": "Clean Code (2nd Edition)",
-  "author": "Robert C. Martin",
+  "authorId": 1,
   "price": 175000,
   "stock": 8
 }

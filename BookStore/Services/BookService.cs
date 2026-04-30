@@ -20,22 +20,30 @@ public class BookService : IBookService
     {
         return await _context.Books
             .AsNoTracking()
+            .Include(b => b.Author)
             .Select(b => ToResponse(b))
             .ToListAsync();
     }
 
     public async Task<BookResponse?> GetByIdAsync(int id)
     {
-        var book = await _context.Books.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
+        var book = await _context.Books
+            .AsNoTracking()
+            .Include(b => b.Author)
+            .FirstOrDefaultAsync(b => b.Id == id);
+
         return book is null ? null : ToResponse(book);
     }
 
-    public async Task<BookResponse> CreateAsync(CreateBookRequest request)
+    public async Task<BookResponse?> CreateAsync(CreateBookRequest request)
     {
+        var authorExists = await _context.Authors.AnyAsync(a => a.Id == request.AuthorId);
+        if (!authorExists) return null;
+
         var book = new Book
         {
             Title = request.Title,
-            Author = request.Author,
+            AuthorId = request.AuthorId,
             Price = request.Price,
             Stock = request.Stock,
             CreatedAt = DateTime.UtcNow
@@ -44,20 +52,33 @@ public class BookService : IBookService
         _context.Books.Add(book);
         await _context.SaveChangesAsync();
 
+        await _context.Entry(book).Reference(b => b.Author).LoadAsync();
         return ToResponse(book);
     }
 
     public async Task<BookResponse?> UpdateAsync(int id, UpdateBookRequest request)
     {
-        var book = await _context.Books.FirstOrDefaultAsync(b => b.Id == id);
+        var book = await _context.Books
+            .Include(b => b.Author)
+            .FirstOrDefaultAsync(b => b.Id == id);
+
         if (book is null) return null;
 
+        var authorExists = await _context.Authors.AnyAsync(a => a.Id == request.AuthorId);
+        if (!authorExists) return null;
+
         book.Title = request.Title;
-        book.Author = request.Author;
+        book.AuthorId = request.AuthorId;
         book.Price = request.Price;
         book.Stock = request.Stock;
 
         await _context.SaveChangesAsync();
+
+        if (book.Author is null || book.Author.Id != book.AuthorId)
+        {
+            await _context.Entry(book).Reference(b => b.Author).LoadAsync();
+        }
+
         return ToResponse(book);
     }
 
@@ -72,5 +93,12 @@ public class BookService : IBookService
     }
 
     private static BookResponse ToResponse(Book b) =>
-        new(b.Id, b.Title, b.Author, b.Price, b.Stock, b.CreatedAt);
+        new(
+            b.Id,
+            b.Title,
+            b.Price,
+            b.Stock,
+            b.CreatedAt,
+            new AuthorResponse(b.Author!.Id, b.Author.Name, b.Author.Bio, b.Author.CreatedAt)
+        );
 }

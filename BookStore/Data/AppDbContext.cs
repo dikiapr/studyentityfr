@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Book> Books { get; set; }
+    public DbSet<Author> Authors { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,6 +20,18 @@ public class AppDbContext : DbContext
         {
             entity.Property(b => b.Price)
                   .HasColumnType("decimal(18,2)");
+
+            entity.HasOne(b => b.Author)
+                  .WithMany(a => a.Books)
+                  .HasForeignKey(b => b.AuthorId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(b => b.AuthorId);
+        });
+
+        modelBuilder.Entity<Author>(entity =>
+        {
+            entity.HasIndex(a => a.Name).IsUnique();
         });
     }
 }
