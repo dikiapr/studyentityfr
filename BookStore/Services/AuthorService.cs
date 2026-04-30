@@ -71,6 +71,13 @@ public class AuthorService : IAuthorService
         return true;
     }
 
-    private static AuthorResponse ToResponse(Author a) =>
-        new(a.Id, a.Name, a.Bio, a.CreatedAt);
+    private static AuthorResponse ToResponse(Author author)
+    {
+        return new AuthorResponse(
+            Id: author.Id,
+            Name: author.Name,
+            Bio: author.Bio,
+            CreatedAt: author.CreatedAt
+        );
+    }
 }

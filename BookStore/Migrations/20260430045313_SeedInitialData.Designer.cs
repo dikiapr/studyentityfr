@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookStore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260430033931_InitialWithAuthor")]
-    partial class InitialWithAuthor
+    [Migration("20260430045313_SeedInitialData")]
+    partial class SeedInitialData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,22 @@ namespace BookStore.Migrations
                         .IsUnique();
 
                     b.ToTable("Authors");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Bio = "Software engineer and author of Clean Code and Clean Architecture.",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Robert C. Martin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Bio = "Co-author of The Pragmatic Programmer.",
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Name = "Andrew Hunt"
+                        });
                 });
 
             modelBuilder.Entity("BookStore.Models.Book", b =>
@@ -59,7 +75,7 @@ namespace BookStore.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Stock")
                         .HasColumnType("INTEGER");
@@ -74,6 +90,35 @@ namespace BookStore.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Books");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AuthorId = 1,
+                            CreatedAt = new DateTime(2024, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Price = 150000m,
+                            Stock = 10,
+                            Title = "Clean Code"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AuthorId = 1,
+                            CreatedAt = new DateTime(2024, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Price = 175000m,
+                            Stock = 7,
+                            Title = "Clean Architecture"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AuthorId = 2,
+                            CreatedAt = new DateTime(2024, 1, 4, 0, 0, 0, 0, DateTimeKind.Utc),
+                            Price = 200000m,
+                            Stock = 5,
+                            Title = "The Pragmatic Programmer"
+                        });
                 });
 
             modelBuilder.Entity("BookStore.Models.Book", b =>

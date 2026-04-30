@@ -100,13 +100,20 @@ public class BookService : IBookService
         return true;
     }
 
-    private static BookResponse ToResponse(Book b) =>
-        new(
-            b.Id,
-            b.Title,
-            b.Price,
-            b.Stock,
-            b.CreatedAt,
-            new AuthorResponse(b.Author!.Id, b.Author.Name, b.Author.Bio, b.Author.CreatedAt)
+    private static BookResponse ToResponse(Book book)
+    {
+        return new BookResponse(
+            Id: book.Id,
+            Title: book.Title,
+            Price: book.Price,
+            Stock: book.Stock,
+            CreatedAt: book.CreatedAt,
+            Author: new AuthorResponse(
+                Id: book.Author!.Id,
+                Name: book.Author.Name,
+                Bio: book.Author.Bio,
+                CreatedAt: book.Author.CreatedAt
+            )
         );
+    }
 }
